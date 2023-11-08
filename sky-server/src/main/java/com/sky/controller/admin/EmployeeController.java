@@ -3,8 +3,10 @@ package com.sky.controller.admin;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -37,6 +39,7 @@ public class EmployeeController {
 
     /**
      * 登录
+     *
      * @param employeeLoginDTO
      * @return
      */
@@ -67,6 +70,7 @@ public class EmployeeController {
 
     /**
      * 退出
+     *
      * @return
      */
     @PostMapping("/logout")
@@ -78,6 +82,8 @@ public class EmployeeController {
 
     /**
      * 新增员工
+     *
+     * @param employeeDTO
      * @return
      */
     @ApiOperation(value = "新增员工")
@@ -87,7 +93,7 @@ public class EmployeeController {
         //新建员工对象
         Employee employee = new Employee();
         //进行属性拷贝
-        BeanUtils.copyProperties(employeeDTO,employee);
+        BeanUtils.copyProperties(employeeDTO, employee);
 
         //新增员工
         employeeService.add(employee);
@@ -95,6 +101,21 @@ public class EmployeeController {
         return Result.success();
     }
 
+
+    /**
+     * 分页查询
+     *
+     * @param pageQueryDTO
+     * @return
+     */
+    @ApiOperation(value = "获取分页数据")
+    @GetMapping("/page")
+    public Result<PageResult> getPage(EmployeePageQueryDTO pageQueryDTO) {
+
+        PageResult pageResult = employeeService.getPage(pageQueryDTO);
+
+        return Result.success(pageResult);
+    }
 
 
 }

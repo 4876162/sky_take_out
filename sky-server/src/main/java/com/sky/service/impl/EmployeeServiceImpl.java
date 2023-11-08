@@ -1,26 +1,33 @@
 package com.sky.service.impl;
 
+
+import com.alibaba.druid.support.json.JSONUtils;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.gson.JsonObject;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
-import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
-import com.sky.utils.JwtUtil;
-import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -82,5 +89,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.insertEmp(employee);
 
         return Result.success();
+    }
+
+
+    /**
+     * 分页查询
+     *
+     * @param pageQueryDTO
+     * @return
+     */
+    @Override
+    public PageResult getPage(EmployeePageQueryDTO pageQueryDTO) {
+
+        //查询员工分页数据
+        //1.开启分页查询
+        PageHelper.startPage(pageQueryDTO.getPage(), pageQueryDTO.getPageSize());
+        //2.调用Mapper层方法进行查询
+        Page<Employee> page = employeeMapper.getEmpList(pageQueryDTO);
+
+        //3.封装PageResult对象
+        PageResult pageResult = new PageResult();
+        pageResult.setTotal(page.getTotal());
+        pageResult.setRecords(page.getResult());
+
+        return pageResult;
     }
 }
