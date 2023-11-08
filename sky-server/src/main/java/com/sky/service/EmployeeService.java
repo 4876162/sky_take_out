@@ -13,6 +13,7 @@ public interface EmployeeService {
 
     /**
      * 员工登录
+     *
      * @param employeeLoginDTO
      * @return
      */
@@ -21,4 +22,10 @@ public interface EmployeeService {
     Result add(Employee employee);
 
     PageResult getPage(EmployeePageQueryDTO pageQueryDTO);
+
+    Result changeStatus(int status, Long id);
+
+    EmployeeDTO getEmpById(Long id);
+
+    Result modifyEmp(EmployeeDTO employeeDTO);
 }

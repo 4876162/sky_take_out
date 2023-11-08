@@ -18,7 +18,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,6 +114,53 @@ public class EmployeeController {
         PageResult pageResult = employeeService.getPage(pageQueryDTO);
 
         return Result.success(pageResult);
+    }
+
+
+    /**
+     * 修改员工状态
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "修改员工状态")
+    @PostMapping("/status/{status}")
+    public Result changeStatus(@PathVariable int status, Long id) {
+
+        Result result = employeeService.changeStatus(status, id);
+
+        return result;
+    }
+
+    /**
+     * 根据id查询员工数据
+     *
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "根据id查询员工数据")
+    @GetMapping("/{id}")
+    public Result<EmployeeDTO> getEmpById(@PathVariable Long id) {
+
+        EmployeeDTO employeeDTO = employeeService.getEmpById(id);
+
+        return Result.success(employeeDTO);
+    }
+
+
+    /**
+     * 修改员工数据
+     * @param employeeDTO
+     * @return
+     */
+    @ApiOperation(value = "修改员工数据")
+    @PutMapping
+    public Result modifyEmp(@RequestBody EmployeeDTO employeeDTO) {
+
+        Result result = employeeService.modifyEmp(employeeDTO);
+
+        return result;
     }
 
 

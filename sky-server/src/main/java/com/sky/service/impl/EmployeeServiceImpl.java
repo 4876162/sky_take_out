@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
@@ -20,6 +21,7 @@ import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -113,5 +115,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         pageResult.setRecords(page.getResult());
 
         return pageResult;
+    }
+
+    @Override
+    public Result changeStatus(int status, Long id) {
+
+        //通过builder新建对象
+        Employee employee = Employee.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        employeeMapper.update(employee);
+
+        return Result.success();
+    }
+
+
+    @Override
+    public EmployeeDTO getEmpById(Long id) {
+
+        EmployeeDTO employeeDTO = employeeMapper.getById(id);
+
+        return employeeDTO;
+    }
+
+
+    @Override
+    public Result modifyEmp(EmployeeDTO employeeDTO) {
+
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        //设置更新时间和更新用户
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.update(employee);
+
+        return Result.success();
     }
 }
