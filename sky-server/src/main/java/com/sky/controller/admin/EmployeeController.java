@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
@@ -8,19 +9,22 @@ import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 员工管理
  */
+
+@Api(tags = "员工相关接口")
 @RestController
 @RequestMapping("/admin/employee")
 @Slf4j
@@ -37,6 +41,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/login")
+    @ApiOperation("员工登录")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
 
@@ -62,12 +67,34 @@ public class EmployeeController {
 
     /**
      * 退出
-     *
      * @return
      */
     @PostMapping("/logout")
+    @ApiOperation("员工注销")
     public Result<String> logout() {
         return Result.success();
     }
+
+
+    /**
+     * 新增员工
+     * @return
+     */
+    @ApiOperation(value = "新增员工")
+    @PostMapping
+    public Result addEmployee(@RequestBody EmployeeDTO employeeDTO) {   //这里使用DTO对象接收值，可以缩小数据范围
+
+        //新建员工对象
+        Employee employee = new Employee();
+        //进行属性拷贝
+        BeanUtils.copyProperties(employeeDTO,employee);
+
+        //新增员工
+        employeeService.add(employee);
+
+        return Result.success();
+    }
+
+
 
 }
