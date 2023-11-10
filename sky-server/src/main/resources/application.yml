@@ -18,6 +18,7 @@ mybatis:
   type-aliases-package: com.sky.entity
   configuration:
     map-underscore-to-camel-case: true
+#    use-generated-keys: true
 
 logging:
   level:

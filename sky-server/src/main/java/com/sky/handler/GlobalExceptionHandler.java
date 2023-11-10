@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
     public Result SQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
         //拿到信息进行拼接
         String message = ex.getMessage();
+        log.info(message);
         if (message.contains("Duplicate entry")) {
             String[] s = message.split(" ");
             String msg = s[2].concat("用户名重复!");
