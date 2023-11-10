@@ -9,5 +9,4 @@
         values (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{createUser},
                 #{updateTime}, #{updateUser})
     </insert>
-
 </mapper>

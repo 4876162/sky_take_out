@@ -33,7 +33,7 @@ public class DishServiceImpl implements DishService {
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
 
-    //添加事务
+    //同时操作两张表，添加事务
     @Transactional
     @Override
     public Result addDish(DishDTO dishDTO) {
@@ -47,16 +47,12 @@ public class DishServiceImpl implements DishService {
 
         //循环设置口味对应的菜品ID
         List<DishFlavor> flavors = dishDTO.getFlavors();
-        flavors = flavors.stream().map((flavor) -> {
-            flavor.setDishId(dish.getId());
-            return flavor;
-        }).collect(Collectors.toList());
+        flavors.forEach((dishFlavor) -> {
+            dishFlavor.setDishId(dish.getId());
+        });
 
         //批量插入
-        for (DishFlavor flavor :
-                flavors) {
-            dishFlavorMapper.addFlavor(flavor);
-        }
+        dishFlavorMapper.batchInsert(flavors);
 
         return Result.success("新增成功！");
     }

@@ -5,6 +5,7 @@ import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.result.Result;
 import com.sky.service.DishService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * Description:
  */
 
+@Api(tags = "菜品管理")
 @CrossOrigin
 @RestController
 @RequestMapping("/admin/dish")
@@ -38,6 +40,16 @@ public class DishController {
         Result result = dishService.addDish(dishDTO);
 
         return result;
+    }
+
+    /**
+     * 菜品分页查询
+     * @return
+     */
+    @GetMapping
+    public Result queryPage() {
+
+        return null;
     }
 
 
