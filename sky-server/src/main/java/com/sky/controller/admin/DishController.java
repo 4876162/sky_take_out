@@ -1,8 +1,10 @@
 package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import io.swagger.annotations.Api;
@@ -46,10 +48,12 @@ public class DishController {
      * 菜品分页查询
      * @return
      */
-    @GetMapping
-    public Result queryPage() {
+    @GetMapping("/page")
+    public Result queryPage(DishPageQueryDTO dishPageQueryDTO) {
 
-        return null;
+        PageResult page = dishService.getPage(dishPageQueryDTO);
+
+        return Result.success(page);
     }
 
 
