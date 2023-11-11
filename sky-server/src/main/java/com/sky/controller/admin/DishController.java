@@ -2,16 +2,15 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
-import com.sky.entity.Dish;
-import com.sky.entity.DishFlavor;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * ClassName: DishController
@@ -54,6 +53,35 @@ public class DishController {
         PageResult page = dishService.getPage(dishPageQueryDTO);
 
         return Result.success(page);
+    }
+
+    /**
+     * 删除菜品
+     * @param ids
+     * @return
+     */
+    @ApiOperation(value = "删除菜品")
+    @DeleteMapping
+    public Result removeDish(@RequestParam List<Long> ids) {
+
+        Result result = dishService.batchRemove(ids);
+
+        return result;
+    }
+
+    /**
+     * 修改菜品状态
+     * @param status
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "修改菜品状态")
+    @PostMapping("/status/{status}")
+    public Result changeStatus(@PathVariable Integer status,Integer id) {
+
+        Result result = dishService.changeStatus(status, id);
+
+        return result;
     }
 
 

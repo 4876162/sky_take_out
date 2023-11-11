@@ -5,6 +5,8 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 
+import java.util.List;
+
 /**
  * ClassName: DishService
  *
@@ -20,4 +22,8 @@ public interface DishService {
 
 
     PageResult getPage(DishPageQueryDTO dishPageQueryDTO);
+
+    Result batchRemove(List<Long> ids);
+
+    Result changeStatus(Integer status, Integer id);
 }
