@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -119,10 +120,64 @@ public class DishServiceImpl implements DishService {
 
     @Override
     //TODO 后续需要在这里判断套餐状态，如果菜品在套餐当中，需要判断套餐状态是否起售
-    public Result changeStatus(Integer status, Integer id) {
+    public Result changeStatus(Integer status, Long id) {
 
-        dishMapper.changeStatus(status,id);
+        dishMapper.changeStatus(status, id);
 
         return Result.success("修改成功!");
+    }
+
+    @Override
+    public Result<DishVO> getByDishId(Long id) {
+
+        //获取菜品信息
+        DishVO dishVO = dishMapper.getById(id);
+
+        //获取口味数据
+        List<DishFlavor> flavorList = dishFlavorMapper.getByDishId(id);
+
+        //封装口味数据
+        dishVO.setFlavors(flavorList);
+
+        return Result.success(dishVO);
+    }
+
+    @Override
+    @Transactional
+    public Result modifyDish(DishDTO dishDTO) {
+
+        //创建Dish对象，进行对象拷贝
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+
+        //更新菜品数据(修改了菜品更新用户和时间)
+        dishMapper.updateDish(dish);
+
+        //更新口味数据
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+
+        //删除原有口味数据
+        dishFlavorMapper.removeDishFlavor(dish.getId());
+
+        if (flavors != null && flavors.size() > 0) {
+
+            //1.给菜品口味数据赋DishId
+            flavors.forEach((flavor) -> {
+                flavor.setDishId(dish.getId());
+            });
+            //2.新增菜品口味数据
+            dishFlavorMapper.batchInsert(flavors);
+
+        }
+
+        return Result.success("修改成功!");
+    }
+
+    @Override
+    public Result getByCategoryId(Long categoryId) {
+
+        List<DishVO> dishList = dishMapper.getByCategoryId(categoryId);
+
+        return Result.success(dishList);
     }
 }

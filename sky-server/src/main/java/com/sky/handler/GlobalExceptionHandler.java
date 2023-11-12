@@ -36,7 +36,12 @@ public class GlobalExceptionHandler {
         log.info(message);
         if (message.contains("Duplicate entry")) {
             String[] s = message.split(" ");
-            String msg = s[2].concat("用户名重复!");
+            String msg = s[2];
+            if (s[5].contains("dish_name")) {
+                msg = s[2].concat("菜品名称重复!");
+            } else {
+                msg = s[2].concat("用户名重复!");
+            }
             return Result.error(msg);
         }
         return Result.error(MessageConstant.UNKNOWN_ERROR);

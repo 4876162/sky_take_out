@@ -4,6 +4,7 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
+import com.sky.vo.DishVO;
 
 import java.util.List;
 
@@ -25,5 +26,11 @@ public interface DishService {
 
     Result batchRemove(List<Long> ids);
 
-    Result changeStatus(Integer status, Integer id);
+    Result changeStatus(Integer status, Long id);
+
+    Result<DishVO> getByDishId(Long id);
+
+    Result modifyDish(DishDTO dishDTO);
+
+    Result getByCategoryId(Long categoryId);
 }
