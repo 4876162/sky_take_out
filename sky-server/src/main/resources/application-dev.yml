@@ -11,3 +11,8 @@ sky:
     access-key-id: LTAI5tAcMv4qghH7Qpufenxm
     access-key-secret: BSg0QpNjoy5rzX3DBedFk72MHQPDkR
     bucket-name: web-tlias-mobai
+  redis:
+    host: localhost
+    port: 6379
+    password: 1234
+    database: 0
