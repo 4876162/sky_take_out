@@ -50,6 +50,7 @@ public interface DishMapper {
             ",image = #{image},description = #{description},update_time = #{updateTime},update_user = #{updateUser} where id = #{id}")
     void updateDish(Dish dish);
 
-    @Select("select * from dish where category_id = #{categoryId}")
-    List<DishVO> getByCategoryId(Long categoryId);
+    //根据传入的dish数据动态查询dish列表
+    List<Dish> list(Dish dish);
+
 }
