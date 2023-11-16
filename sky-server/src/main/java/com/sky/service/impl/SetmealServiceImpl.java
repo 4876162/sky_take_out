@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.StatusConstant;
@@ -15,8 +16,10 @@ import com.sky.result.Result;
 import com.sky.service.SetmealService;
 import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ import java.util.List;
  * Description:
  */
 
+@Slf4j
 @Service
 public class SetmealServiceImpl implements SetmealService {
 
@@ -39,6 +43,9 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     @Transactional
@@ -147,20 +154,52 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 条件查询
+     *
      * @param setmeal
      * @return
      */
     public List<Setmeal> list(Setmeal setmeal) {
+        //判断缓存中是否有套餐数据
+        String cacheName = "setmeal_" + setmeal.getCategoryId();
+        if (redisTemplate.hasKey(cacheName)) {
+            //返回缓存数据
+            log.info("读取缓存:" + cacheName);
+            String json = (String) redisTemplate.opsForValue().get(cacheName);
+            List<Setmeal> setmealList = JSON.parseArray(json, Setmeal.class);
+            return setmealList;
+        }
+        //不存在数据
         List<Setmeal> list = setmealMapper.list(setmeal);
+
+        //存入缓存
+        redisTemplate.opsForValue().set(cacheName, JSON.toJSONString(list));
+
         return list;
     }
 
     /**
      * 根据id查询菜品选项
+     *
      * @param id
      * @return
      */
     public List<DishItemVO> getDishItemById(Long id) {
-        return setmealMapper.getDishItemBySetmealId(id);
+
+        //查询是否存在套餐菜品对应缓存
+        String cacheName = "setmeal_dish_" + id;
+        if (redisTemplate.hasKey(cacheName)) {
+            log.info("读取缓存:" + cacheName);
+            //返回缓存数据
+            String json = (String) redisTemplate.opsForValue().get(cacheName);
+            //转成java对象
+            List<DishItemVO> dishItemVOList = JSON.parseArray(json, DishItemVO.class);
+            return dishItemVOList;
+        }
+
+        List<DishItemVO> list = setmealMapper.getDishItemBySetmealId(id);
+        //缓存数据
+        redisTemplate.opsForValue().set(cacheName, JSON.toJSONString(list));
+
+        return list;
     }
 }

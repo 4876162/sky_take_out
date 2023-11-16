@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
@@ -16,8 +17,10 @@ import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +37,7 @@ import java.util.List;
  * Description:
  */
 
+@Slf4j
 @Service
 public class DishServiceImpl implements DishService {
 
@@ -45,6 +49,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     //同时操作两张表，添加事务
@@ -188,6 +195,18 @@ public class DishServiceImpl implements DishService {
      * @return
      */
     public List<DishVO> listWithFlavor(Dish dish) {
+        //判断id对应的分类是否存在Redis中
+        String cacheName = "dish_" + dish.getCategoryId();
+        //如果存在缓存中返回缓存数据
+        if (redisTemplate.hasKey(cacheName) == true) {
+            log.info("读取缓存:" + cacheName);
+            String json = (String) redisTemplate.opsForValue().get(cacheName);
+            List<DishVO> dishVOList = JSONObject.parseArray(json, DishVO.class);
+            return dishVOList;
+        }
+
+        //不存在缓存中
+        //查数据库
         List<Dish> dishList = dishMapper.list(dish);
 
         List<DishVO> dishVOList = new ArrayList<>();
@@ -202,6 +221,9 @@ public class DishServiceImpl implements DishService {
             dishVO.setFlavors(flavors);
             dishVOList.add(dishVO);
         }
+
+        //存入缓存中
+        redisTemplate.opsForValue().set(cacheName, JSONObject.toJSONString(dishVOList));
 
         return dishVOList;
     }
