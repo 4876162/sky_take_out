@@ -25,8 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * ClassName: DishServiceImpl
@@ -71,9 +70,12 @@ public class DishServiceImpl implements DishService {
         flavors.forEach((dishFlavor) -> {
             dishFlavor.setDishId(dish.getId());
         });
-
-        //批量插入
+        //批量插入口味数据
         dishFlavorMapper.batchInsert(flavors);
+
+        //清理对应分类下的缓存数据
+        String cacheName = "dish_" + dish.getCategoryId();
+        redisTemplate.delete(cacheName);
 
         return Result.success("新增成功！");
     }
@@ -115,6 +117,19 @@ public class DishServiceImpl implements DishService {
             }
         }
 
+        //批量移除redis缓存数据
+        Set<Long> set = new HashSet<>();
+        ids.forEach((id) -> {
+            set.add(dishMapper.getById(id).getCategoryId());
+        });
+        Iterator<Long> iterator = set.iterator();
+        while (iterator.hasNext()) {
+            //移除缓存中的数据
+            String cacheName = "dish_" + iterator.next();
+            redisTemplate.delete(cacheName);
+            log.info("移除缓存：" + cacheName);
+        }
+
         for (Long id : ids) {
             //批量删除菜品
             dishMapper.removeDish(id);
@@ -131,6 +146,12 @@ public class DishServiceImpl implements DishService {
     public Result changeStatus(Integer status, Long id) {
 
         dishMapper.changeStatus(status, id);
+
+        //清除缓存
+        Long categoryId = dishMapper.getById(id).getCategoryId();
+        String cacheName = "dish_" + categoryId;
+        redisTemplate.delete(cacheName);
+        log.info("清除缓存：" + cacheName);
 
         return Result.success("修改成功!");
     }
@@ -178,6 +199,12 @@ public class DishServiceImpl implements DishService {
 
         }
 
+        //清除缓存
+        Long categoryId = dish.getCategoryId();
+        String cacheName = "dish_" + categoryId;
+        redisTemplate.delete(cacheName);
+        log.info("清除缓存:" + cacheName);
+
         return Result.success("修改成功!");
     }
 
@@ -191,6 +218,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 条件查询菜品和口味
+     *
      * @param dish
      * @return
      */
@@ -213,7 +241,7 @@ public class DishServiceImpl implements DishService {
 
         for (Dish d : dishList) {
             DishVO dishVO = new DishVO();
-            BeanUtils.copyProperties(d,dishVO);
+            BeanUtils.copyProperties(d, dishVO);
 
             //根据菜品id查询对应的口味
             List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
