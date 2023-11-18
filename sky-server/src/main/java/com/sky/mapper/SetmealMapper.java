@@ -34,7 +34,7 @@ public interface SetmealMapper {
     Page<SetmealVO> getPage(SetmealPageQueryDTO setmealPageQueryDTO);
 
     @Update("update setmeal set status = #{status} where id = #{id}")
-    void changeStatus(Integer status, Long id);
+    void changeStatus(Integer status, Integer id);
 
     void deleteSetMeal(List<Integer> ids);
 

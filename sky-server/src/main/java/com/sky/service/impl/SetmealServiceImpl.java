@@ -19,11 +19,16 @@ import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * ClassName: SetmealServiceImpl
@@ -44,11 +49,9 @@ public class SetmealServiceImpl implements SetmealService {
     @Autowired
     private SetmealDishMapper setmealDishMapper;
 
-    @Autowired
-    private RedisTemplate redisTemplate;
-
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "setmeal", key = "#setmealDTO.categoryId")
     public Result InsertSetmeal(SetmealDTO setmealDTO) {
 
         //新增套餐数据
@@ -88,7 +91,8 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
-    public Result changeStatus(Integer status, Long id) {
+    @CacheEvict(cacheNames = "setmeal", allEntries = true)
+    public Result changeStatus(Integer status, Integer id) {
 
         setmealMapper.changeStatus(status, id);
 
@@ -96,6 +100,7 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "setmeal_dish", allEntries = true)
     public Result removeSetMeal(List<Integer> ids) {
 
         for (Integer id : ids) {
@@ -105,6 +110,8 @@ public class SetmealServiceImpl implements SetmealService {
             }
         }
 
+        // 这里无需批量移除redis中套餐缓存数据，因为菜品被禁用状态才能删除
+        // 当被禁用的时候，页面是不显示菜品数据的
         setmealMapper.deleteSetMeal(ids);
 
         return Result.success("删除成功!");
@@ -124,6 +131,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = {"setmeal", "setmeal_dish"}, allEntries = true)
     public Result modifySetMeal(SetmealDTO setmealDTO) {
 
         //新建Setmeal对象，属性拷贝
@@ -158,47 +166,24 @@ public class SetmealServiceImpl implements SetmealService {
      * @param setmeal
      * @return
      */
+    @Cacheable(cacheNames = "setmeal", key = "#setmeal.categoryId")
     public List<Setmeal> list(Setmeal setmeal) {
-        //判断缓存中是否有套餐数据
-        String cacheName = "setmeal_" + setmeal.getCategoryId();
-        if (redisTemplate.hasKey(cacheName)) {
-            //返回缓存数据
-            log.info("读取缓存:" + cacheName);
-            String json = (String) redisTemplate.opsForValue().get(cacheName);
-            List<Setmeal> setmealList = JSON.parseArray(json, Setmeal.class);
-            return setmealList;
-        }
         //不存在数据
         List<Setmeal> list = setmealMapper.list(setmeal);
-
-        //存入缓存
-        redisTemplate.opsForValue().set(cacheName, JSON.toJSONString(list));
 
         return list;
     }
 
     /**
-     * 根据id查询菜品选项
+     * 根据id查询套餐中菜品选项
      *
      * @param id
      * @return
      */
+    @Cacheable(cacheNames = "setmeal_dish", key = "#id")
     public List<DishItemVO> getDishItemById(Long id) {
 
-        //查询是否存在套餐菜品对应缓存
-        String cacheName = "setmeal_dish_" + id;
-        if (redisTemplate.hasKey(cacheName)) {
-            log.info("读取缓存:" + cacheName);
-            //返回缓存数据
-            String json = (String) redisTemplate.opsForValue().get(cacheName);
-            //转成java对象
-            List<DishItemVO> dishItemVOList = JSON.parseArray(json, DishItemVO.class);
-            return dishItemVOList;
-        }
-
         List<DishItemVO> list = setmealMapper.getDishItemBySetmealId(id);
-        //缓存数据
-        redisTemplate.opsForValue().set(cacheName, JSON.toJSONString(list));
 
         return list;
     }

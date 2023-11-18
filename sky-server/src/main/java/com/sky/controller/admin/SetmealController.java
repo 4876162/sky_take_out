@@ -70,7 +70,7 @@ public class SetmealController {
      */
     @ApiOperation(value = "套餐状态更改")
     @PostMapping("/status/{status}")
-    public Result changeStatus(@PathVariable Integer status,Long id) {
+    public Result changeStatus(@PathVariable Integer status,Integer id) {
 
         Result result = setmealService.changeStatus(status, id);
 
