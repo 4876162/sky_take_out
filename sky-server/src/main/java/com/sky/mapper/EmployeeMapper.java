@@ -26,7 +26,7 @@ public interface EmployeeMapper {
             "values(#{name},#{username},#{password},#{phone},#{sex}," +
             "#{idNumber},#{status},#{createTime},#{updateTime},#{createUser},#{updateUser})")
     @AutoFill(value = OperationType.INSERT)
-    void insertEmp(Employee employee);
+    int insertEmp(Employee employee);
 
     Page<Employee> getEmpList(EmployeePageQueryDTO queryDTO);
 

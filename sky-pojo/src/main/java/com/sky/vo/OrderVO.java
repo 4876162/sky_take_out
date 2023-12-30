@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderVO extends Orders implements Serializable {
+public class OrderVO extends Orders implements Serializable {   //VO类继承了Orders类
 
     //订单菜品信息
     private String orderDishes;

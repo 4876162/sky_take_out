@@ -12,9 +12,9 @@ sky:
     access-key-secret: BSg0QpNjoy5rzX3DBedFk72MHQPDkR
     bucket-name: web-tlias-mobai
   redis:
-    host: localhost
+    host: 47.120.9.108
     port: 6379
-    password: 1234
+    password: 123456
     database: 0
   wechat:
     appid: wxbc0b078a4ca8d008

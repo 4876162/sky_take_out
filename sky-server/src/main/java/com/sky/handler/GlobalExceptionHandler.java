@@ -17,7 +17,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 public class GlobalExceptionHandler {
 
     /**
-     * 捕获业务异常
+     * 捕获最底层业务异常
      *
      * @param ex
      * @return
@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
     }
 
 
+    /**
+     * 捕获SQLIntegrity完整性异常，并返回错误信息
+     * @param ex
+     * @return
+     */
     @ExceptionHandler
     public Result SQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
         //拿到信息进行拼接
@@ -36,12 +41,8 @@ public class GlobalExceptionHandler {
         log.info(message);
         if (message.contains("Duplicate entry")) {
             String[] s = message.split(" ");
-            String msg = s[2];
-            if (s[5].contains("dish_name")) {
-                msg = s[2].concat("菜品名称重复!");
-            } else {
-                msg = s[2].concat("用户名重复!");
-            }
+            String msg;
+            msg = s[5].contains("dish_name") ?  s[2].concat("菜品名称重复!") : s[2].concat("用户名重复!");
             return Result.error(msg);
         }
         return Result.error(MessageConstant.UNKNOWN_ERROR);

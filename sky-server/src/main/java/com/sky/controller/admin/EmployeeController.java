@@ -95,9 +95,9 @@ public class EmployeeController {
         BeanUtils.copyProperties(employeeDTO, employee);
 
         //新增员工
-        employeeService.add(employee);
+        Result result = employeeService.add(employee);
 
-        return Result.success();
+        return result;
     }
 
 

@@ -83,12 +83,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         //设置新增用户，时间，等数据
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
         employee.setStatus(StatusConstant.ENABLE);
-//        employee.setCreateTime(LocalDateTime.now());
-//        employee.setUpdateTime(LocalDateTime.now());
-//        employee.setCreateUser(BaseContext.getCurrentId());
-//        employee.setUpdateUser(BaseContext.getCurrentId());
 
-        employeeMapper.insertEmp(employee);
+        try {
+            employeeMapper.insertEmp(employee);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         return Result.success();
     }
@@ -117,6 +117,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return pageResult;
     }
 
+    /**
+     * 修改员工账号状态
+     *
+     * @param status
+     * @param id
+     * @return
+     */
     @Override
     public Result changeStatus(int status, Long id) {
 
@@ -152,7 +159,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        employee.setUpdateTime(LocalDateTime.now());
 //        employee.setUpdateUser(BaseContext.getCurrentId());
 
-        employeeMapper.update(employee);
+        try {
+            employeeMapper.update(employee);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         return Result.success();
     }

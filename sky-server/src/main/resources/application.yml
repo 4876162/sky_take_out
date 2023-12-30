@@ -49,3 +49,9 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+  baidu:
+    ak: klfgzHXfhBv4tGv7IWmFYyeZMMIinHnt
+    sk: eOlcdGrCRiFqY9ISw4oUcpWqOZ3g2Qvr
+  shop:
+    address: 江西省南昌市南昌县紫阳大道115号江西科技学院
+

@@ -27,7 +27,7 @@ import java.util.List;
 
 @Api(tags = "菜品管理")
 @CrossOrigin
-@RestController
+@RestController("adminDishController")
 @RequestMapping("/admin/dish")
 public class DishController {
 

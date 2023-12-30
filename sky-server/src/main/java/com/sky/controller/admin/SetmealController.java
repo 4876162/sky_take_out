@@ -84,7 +84,11 @@ public class SetmealController {
      */
     @ApiOperation(value = "删除套餐")
     @DeleteMapping
-    public Result remove(@RequestParam List<Integer> ids) {
+    public Result remove(@RequestParam List<Long> ids) {
+
+        if(ids.size() == 0) {
+            return Result.error("没有指定删除对象！");
+        }
 
         Result result = setmealService.removeSetMeal(ids);
 

@@ -101,20 +101,24 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     @CacheEvict(cacheNames = "setmeal_dish", allEntries = true)
-    public Result removeSetMeal(List<Integer> ids) {
+    public Result removeSetMeal(List<Long> ids) {
 
-        for (Integer id : ids) {
+        for (Long id : ids) {
             Setmeal setMeal = setmealMapper.getSetMeal(id);
             if (setMeal.getStatus() == StatusConstant.ENABLE) {
-                throw new DeletionNotAllowedException("套餐起售中，无法删除！");
+                throw new DeletionNotAllowedException("套餐起售中，无法删除!");
             }
         }
 
         // 这里无需批量移除redis中套餐缓存数据，因为菜品被禁用状态才能删除
         // 当被禁用的时候，页面是不显示菜品数据的
-        setmealMapper.deleteSetMeal(ids);
+        int success = setmealMapper.deleteSetMeal(ids);
 
-        return Result.success("删除成功!");
+        if(success >= 1) {
+            return Result.success("删除成功!");
+        } else {
+            return Result.error("删除失败!");
+        }
     }
 
     @Override

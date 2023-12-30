@@ -28,7 +28,7 @@ public interface SetmealService {
 
     Result changeStatus(Integer status, Integer id);
 
-    Result removeSetMeal(List<Integer> ids);
+    Result removeSetMeal(List<Long> ids);
 
     Result getByIdWithSetMealDishes(Integer id);
 
