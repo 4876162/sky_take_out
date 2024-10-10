@@ -8,7 +8,7 @@ Author：MoBai
 软件架构说明
 
 本系统使用了 SpringBoot + 微信小程序的分离开发模式
-数据库模块使用了MYSql并使用MyBatis简化开发
+数据库模块使用了MySQL并使用MyBatis简化开发
 使用了Redis缓存，优化了用户端套餐和菜品查询体验
 
 #### 安装教程
